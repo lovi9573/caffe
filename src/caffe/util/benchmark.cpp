@@ -15,11 +15,19 @@ Timer::Timer()
 Timer::~Timer() {
   if (Caffe::mode() == Caffe::GPU) {
 #ifndef CPU_ONLY
+#ifdef GPU_ENABLED
     CUDA_CHECK(cudaEventDestroy(start_gpu_));
     CUDA_CHECK(cudaEventDestroy(stop_gpu_));
 #else
     NO_GPU;
 #endif
+#endif
+  }else if(Caffe::mode() == Caffe::FPGA){
+#endif //GPU_ENABLED
+#ifdef FPGA_ENABLE
+  //TODO: ??
+#endif  //FPGA_ENABLED
+#endif //!CPU_ONLY
   }
 }
 

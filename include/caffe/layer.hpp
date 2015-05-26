@@ -421,6 +421,7 @@ inline Dtype Layer<Dtype>::Forward(const vector<Blob<Dtype>*>& bottom,
   case Caffe::GPU:
     Forward_gpu(bottom, top);
 #ifndef CPU_ONLY
+#ifdef GPU_ENABLED
     for (int top_id = 0; top_id < top.size(); ++top_id) {
       if (!this->loss(top_id)) { continue; }
       const int count = top[top_id]->count();
@@ -430,7 +431,15 @@ inline Dtype Layer<Dtype>::Forward(const vector<Blob<Dtype>*>& bottom,
       caffe_gpu_dot(count, data, loss_weights, &blob_loss);
       loss += blob_loss;
     }
-#endif
+#endif //GPU_ENABLED
+#endif //!CPU_ONLY
+  case Caffe::FPGA:
+	  Forward_fpga(bottom, top);
+#ifndef CPU_ONLY
+#ifdef FPGA_ENABLE
+  //TODO: Fill in FPGA forward code
+#endif  //FPGA_ENABLED
+#endif //!CPU_ONLY
     break;
   default:
     LOG(FATAL) << "Unknown caffe mode.";

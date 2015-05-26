@@ -5,7 +5,13 @@
 # USE_CUDNN := 1
 
 # CPU-only switch (uncomment to build without GPU support).
-# CPU_ONLY := 1
+ CPU_ONLY := 1
+
+# GPU enabled switch (comment to build without GPU support).
+#GPU_ENABLED := 1
+
+# FPGA enabled switch (comment to build without FPGA support).
+#FPGA_ENABLED := 1
 
 # To customize your choice of compiler, uncomment and set the following.
 # N.B. the default for Linux is g++ and the default for OSX is clang++

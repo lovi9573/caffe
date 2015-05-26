@@ -792,12 +792,20 @@ void Net<Dtype>::Update() {
       break;
     case Caffe::GPU:
 #ifndef CPU_ONLY
+#ifdef GPU_ENABLED
       this_diff = params_[i]->gpu_diff();
       owner_diff = params_[param_owners_[i]]->mutable_gpu_diff();
       caffe_gpu_add(count, this_diff, owner_diff, owner_diff);
 #else
       NO_GPU;
 #endif
+#endif
+    case Caffe::FPGA:
+#ifndef CPU_ONLY
+#ifdef FPGA_ENABLE
+  //TODO: NET UPDATE
+#endif  //FPGA_ENABLED
+#endif //!CPU_ONLY
       break;
     default:
       LOG(FATAL) << "Unknown caffe mode: " << Caffe::mode();

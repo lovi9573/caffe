@@ -82,7 +82,7 @@ void Blob<Dtype>::set_cpu_data(Dtype* data) {
 template <typename Dtype>
 const Dtype* Blob<Dtype>::gpu_data() const {
   CHECK(data_);
-  return (const Dtype*)data_->gpu_data();
+  return (const Dtype*)data_->device_data();
 }
 
 template <typename Dtype>
@@ -94,7 +94,7 @@ const Dtype* Blob<Dtype>::cpu_diff() const {
 template <typename Dtype>
 const Dtype* Blob<Dtype>::gpu_diff() const {
   CHECK(diff_);
-  return (const Dtype*)diff_->gpu_data();
+  return (const Dtype*)diff_->device_data();
 }
 
 template <typename Dtype>
@@ -149,16 +149,21 @@ void Blob<Dtype>::Update() {
         static_cast<const Dtype*>(diff_->cpu_data()),
         static_cast<Dtype*>(data_->mutable_cpu_data()));
     break;
-  case SyncedMemory::HEAD_AT_GPU:
+  case SyncedMemory::HEAD_AT_DEVICE:
   case SyncedMemory::SYNCED:
 #ifndef CPU_ONLY
+#ifdef GPU_ENABLED
     // perform computation on GPU
     caffe_gpu_axpy<Dtype>(count_, Dtype(-1),
-        static_cast<const Dtype*>(diff_->gpu_data()),
+        static_cast<const Dtype*>(diff_->device_data()),
         static_cast<Dtype*>(data_->mutable_gpu_data()));
 #else
     NO_GPU;
-#endif
+#endif //GPU_ENABLED
+#ifdef FPGA_ENABLE
+  //TODO: updata on fpga
+#endif  //FPGA_ENABLED
+#endif //!CPU_ONLY
     break;
   default:
     LOG(FATAL) << "Syncedmem not initialized.";
@@ -181,9 +186,10 @@ Dtype Blob<Dtype>::asum_data() const {
   switch (data_->head()) {
   case SyncedMemory::HEAD_AT_CPU:
     return caffe_cpu_asum(count_, cpu_data());
-  case SyncedMemory::HEAD_AT_GPU:
+  case SyncedMemory::HEAD_AT_DEVICE:
   case SyncedMemory::SYNCED:
 #ifndef CPU_ONLY
+#ifdef GPU_ENABLED
   {
     Dtype asum;
     caffe_gpu_asum(count_, gpu_data(), &asum);
@@ -191,7 +197,11 @@ Dtype Blob<Dtype>::asum_data() const {
   }
 #else
     NO_GPU;
-#endif
+#endif //GPU_ENABLED
+#ifdef FPGA_ENABLE
+  //TODO: FPGA ASUM_DATA
+#endif  //FPGA_ENABLED
+#endif //!CPU_ONLY
   case SyncedMemory::UNINITIALIZED:
     return 0;
   default:
@@ -216,9 +226,10 @@ Dtype Blob<Dtype>::asum_diff() const {
   switch (diff_->head()) {
   case SyncedMemory::HEAD_AT_CPU:
     return caffe_cpu_asum(count_, cpu_diff());
-  case SyncedMemory::HEAD_AT_GPU:
+  case SyncedMemory::HEAD_AT_DEVICE:
   case SyncedMemory::SYNCED:
 #ifndef CPU_ONLY
+#ifdef GPU_ENABLED
   {
     Dtype asum;
     caffe_gpu_asum(count_, gpu_diff(), &asum);
@@ -226,7 +237,11 @@ Dtype Blob<Dtype>::asum_diff() const {
   }
 #else
     NO_GPU;
-#endif
+#endif //GPU_ENABLED
+#ifdef FPGA_ENABLE
+  //TODO: fpga asum diff
+#endif  //FPGA_ENABLED
+#endif //!CPU_ONLY
   case SyncedMemory::UNINITIALIZED:
     return 0;
   default:
@@ -255,14 +270,19 @@ Dtype Blob<Dtype>::sumsq_data() const {
     data = cpu_data();
     sumsq = caffe_cpu_dot(count_, data, data);
     break;
-  case SyncedMemory::HEAD_AT_GPU:
+  case SyncedMemory::HEAD_AT_DEVICE:
   case SyncedMemory::SYNCED:
 #ifndef CPU_ONLY
+#ifdef GPU_ENABLED
     data = gpu_data();
     caffe_gpu_dot(count_, data, data, &sumsq);
 #else
     NO_GPU;
-#endif
+#endif //GPU_ENABLED
+#ifdef FPGA_ENABLE
+  //TODO: ON FPGA
+#endif  //FPGA_ENABLED
+#endif //!CPU_ONLY
     break;
   case SyncedMemory::UNINITIALIZED:
     return 0;
@@ -292,15 +312,20 @@ Dtype Blob<Dtype>::sumsq_diff() const {
     diff = cpu_diff();
     sumsq = caffe_cpu_dot(count_, diff, diff);
     break;
-  case SyncedMemory::HEAD_AT_GPU:
+  case SyncedMemory::HEAD_AT_DEVICE:
   case SyncedMemory::SYNCED:
 #ifndef CPU_ONLY
+#ifdef GPU_ENABLED
     diff = gpu_diff();
     caffe_gpu_dot(count_, diff, diff, &sumsq);
     break;
 #else
     NO_GPU;
-#endif
+#endif //GPU_ENABLED
+#ifdef FPGA_ENABLE
+  //TODO: ON FPGA
+#endif  //FPGA_ENABLED
+#endif //!CPU_ONLY
   case SyncedMemory::UNINITIALIZED:
     return 0;
   default:
@@ -326,15 +351,20 @@ void Blob<Dtype>::scale_data(Dtype scale_factor) {
     data = mutable_cpu_data();
     caffe_scal(count_, scale_factor, data);
     return;
-  case SyncedMemory::HEAD_AT_GPU:
+  case SyncedMemory::HEAD_AT_DEVICE:
   case SyncedMemory::SYNCED:
 #ifndef CPU_ONLY
+#ifdef GPU_ENABLED
     data = mutable_gpu_data();
     caffe_gpu_scal(count_, scale_factor, data);
     return;
 #else
     NO_GPU;
-#endif
+#endif //GPU_ENABLED
+#ifdef FPGA_ENABLE
+  //TODO: ON FPGA
+#endif  //FPGA_ENABLED
+#endif //!CPU_ONLY
   case SyncedMemory::UNINITIALIZED:
     return;
   default:
@@ -359,15 +389,20 @@ void Blob<Dtype>::scale_diff(Dtype scale_factor) {
     diff = mutable_cpu_diff();
     caffe_scal(count_, scale_factor, diff);
     return;
-  case SyncedMemory::HEAD_AT_GPU:
+  case SyncedMemory::HEAD_AT_DEVICE:
   case SyncedMemory::SYNCED:
 #ifndef CPU_ONLY
+#ifdef GPU_ENABLED
     diff = mutable_gpu_diff();
     caffe_gpu_scal(count_, scale_factor, diff);
     return;
 #else
     NO_GPU;
-#endif
+#endif //GPU_ENABLED
+#ifdef FPGA_ENABLE
+  //TODO:
+#endif  //FPGA_ENABLED
+#endif //!CPU_ONLY
   case SyncedMemory::UNINITIALIZED:
     return;
   default:

@@ -142,8 +142,8 @@ DEFINE_CAFFE_CPU_UNARY_FUNC(fabs, y[i] = std::fabs(x[i]));
 template <typename Dtype>
 void caffe_cpu_scale(const int n, const Dtype alpha, const Dtype *x, Dtype* y);
 
-#ifndef CPU_ONLY  // GPU
-
+#ifndef CPU_ONLY
+#ifdef GPU_ENABLED //GPU
 // Decaf gpu gemm provides an interface that is almost the same as the cpu
 // gemm function - following the c convention and calling the fortran-order
 // gpu code under the hood.
@@ -173,9 +173,11 @@ void caffe_gpu_set(const int N, const Dtype alpha, Dtype *X);
 
 inline void caffe_gpu_memset(const size_t N, const int alpha, void* X) {
 #ifndef CPU_ONLY
+#ifdef GPU_ENABLED
   CUDA_CHECK(cudaMemset(X, alpha, N));  // NOLINT(caffe/alt_fn)
 #else
   NO_GPU;
+#endif
 #endif
 }
 
@@ -266,8 +268,11 @@ void caffe_gpu_##name<double>(const int n, const double* x, double* y) { \
   name##_kernel<double><<<CAFFE_GET_BLOCKS(n), CAFFE_CUDA_NUM_THREADS>>>( \
       n, x, y); \
 }
-
-#endif  // !CPU_ONLY
+#endif	// GPU
+#ifdef FPGA_ENABLE
+//TODO: FPGA math functions and memset
+#endif
+#endif 	// !CPU_ONLY
 
 }  // namespace caffe
 

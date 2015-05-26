@@ -49,16 +49,16 @@ class SyncedMemory {
   ~SyncedMemory();
   const void* cpu_data();
   void set_cpu_data(void* data);
-  const void* gpu_data();
+  const void* device_data();
   void* mutable_cpu_data();
   void* mutable_gpu_data();
-  enum SyncedHead { UNINITIALIZED, HEAD_AT_CPU, HEAD_AT_GPU, SYNCED };
+  enum SyncedHead { UNINITIALIZED, HEAD_AT_CPU, HEAD_AT_DEVICE, SYNCED };
   SyncedHead head() { return head_; }
   size_t size() { return size_; }
 
  private:
   void to_cpu();
-  void to_gpu();
+  void to_device();
   void* cpu_ptr_;
   void* gpu_ptr_;
   size_t size_;

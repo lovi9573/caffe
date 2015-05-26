@@ -87,11 +87,20 @@ void caffe_copy(const int N, const Dtype* X, Dtype* Y) {
   if (X != Y) {
     if (Caffe::mode() == Caffe::GPU) {
 #ifndef CPU_ONLY
+#ifdef GPU_ENABLED
       // NOLINT_NEXT_LINE(caffe/alt_fn)
       CUDA_CHECK(cudaMemcpy(Y, X, sizeof(Dtype) * N, cudaMemcpyDefault));
 #else
       NO_GPU;
 #endif
+#endif
+    }else if(Caffe::mode() == Caffe::FPGA){
+#ifndef CPU_ONLY
+#ifdef FPGA_ENABLE
+  //TODO: fpga mem copy
+#endif  //FPGA_ENABLED
+#endif //!CPU_ONLY
+
     } else {
       memcpy(Y, X, sizeof(Dtype) * N);  // NOLINT(caffe/alt_fn)
     }

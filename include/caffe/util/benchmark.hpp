@@ -28,8 +28,13 @@ class Timer {
   bool running_;
   bool has_run_at_least_once_;
 #ifndef CPU_ONLY
+#ifdef GPU_ENABLED
   cudaEvent_t start_gpu_;
   cudaEvent_t stop_gpu_;
+#endif
+#ifdef FPGA_ENABLE
+  //TODO: FPGA timing events
+#endif
 #endif
   boost::posix_time::ptime start_cpu_;
   boost::posix_time::ptime stop_cpu_;

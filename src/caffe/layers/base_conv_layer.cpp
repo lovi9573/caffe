@@ -223,6 +223,7 @@ void BaseConvolutionLayer<Dtype>::backward_cpu_bias(Dtype* bias,
 }
 
 #ifndef CPU_ONLY
+#ifdef GPU_ENABLED
 
 template <typename Dtype>
 void BaseConvolutionLayer<Dtype>::forward_gpu_gemm(const Dtype* input,
@@ -291,7 +292,11 @@ void BaseConvolutionLayer<Dtype>::backward_gpu_bias(Dtype* bias,
       input, bias_multiplier_.gpu_data(), 1., bias);
 }
 
-#endif  // !CPU_ONLY
+#endif //GPU_ENABLED
+#ifdef FPGA_ENABLE
+  //TODO: Implement in fpga
+#endif  //FPGA_ENABLED
+#endif //!CPU_ONLY
 
 INSTANTIATE_CLASS(BaseConvolutionLayer);
 
