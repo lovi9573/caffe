@@ -19,6 +19,8 @@ using caffe::vector;
 
 DEFINE_int32(gpu, -1,
     "Run in GPU mode on given device ID.");
+DEFINE_bool(fpga,false,
+		"Run using an fpga.");
 DEFINE_string(solver, "",
     "The solver definition protocol buffer text file.");
 DEFINE_string(model, "",
@@ -113,6 +115,9 @@ int train() {
     LOG(INFO) << "Use GPU with device ID " << FLAGS_gpu;
     Caffe::SetDevice(FLAGS_gpu);
     Caffe::set_mode(Caffe::GPU);
+  } else if(FLAGS_fpga || solver_param.solver_mode() == caffe::SolverParameter_SolverMode_FPGA){
+	LOG(INFO) << "Use FPGA.";
+	Caffe::set_mode(Caffe::FPGA);
   } else {
     LOG(INFO) << "Use CPU.";
     Caffe::set_mode(Caffe::CPU);
@@ -147,6 +152,9 @@ int test() {
     LOG(INFO) << "Use GPU with device ID " << FLAGS_gpu;
     Caffe::SetDevice(FLAGS_gpu);
     Caffe::set_mode(Caffe::GPU);
+  } else if(FLAGS_fpga){
+		LOG(INFO) << "Use FPGA.";
+		Caffe::set_mode(Caffe::FPGA);
   } else {
     LOG(INFO) << "Use CPU.";
     Caffe::set_mode(Caffe::CPU);
@@ -212,6 +220,9 @@ int time() {
     LOG(INFO) << "Use GPU with device ID " << FLAGS_gpu;
     Caffe::SetDevice(FLAGS_gpu);
     Caffe::set_mode(Caffe::GPU);
+  } else if(FLAGS_fpga ){
+		LOG(INFO) << "Use FPGA.";
+		Caffe::set_mode(Caffe::FPGA);
   } else {
     LOG(INFO) << "Use CPU.";
     Caffe::set_mode(Caffe::CPU);
