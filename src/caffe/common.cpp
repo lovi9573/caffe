@@ -39,50 +39,7 @@ void GlobalInit(int* pargc, char*** pargv) {
   ::google::InstallFailureSignalHandler();
 }
 
-#ifdef CPU_ONLY  // CPU-only Caffe.
-
-Caffe::Caffe()
-    : random_generator_(), mode_(Caffe::CPU) { }
-
-Caffe::~Caffe() { }
-
-void Caffe::set_random_seed(const unsigned int seed) {
-  // RNG seed
-  Get().random_generator_.reset(new RNG(seed));
-}
-
-void Caffe::SetDevice(const int device_id) {
-  NO_GPU;
-}
-
-void Caffe::DeviceQuery() {
-  NO_GPU;
-}
-
-
-class Caffe::RNG::Generator {
- public:
-  Generator() : rng_(new caffe::rng_t(cluster_seedgen())) {}
-  explicit Generator(unsigned int seed) : rng_(new caffe::rng_t(seed)) {}
-  caffe::rng_t* rng() { return rng_.get(); }
- private:
-  shared_ptr<caffe::rng_t> rng_;
-};
-
-Caffe::RNG::RNG() : generator_(new Generator()) { }
-
-Caffe::RNG::RNG(unsigned int seed) : generator_(new Generator(seed)) { }
-
-Caffe::RNG& Caffe::RNG::operator=(const RNG& other) {
-  generator_ = other.generator_;
-  return *this;
-}
-
-void* Caffe::RNG::generator() {
-  return static_cast<void*>(generator_->rng());
-}
-
-#else  // Normal GPU + CPU Caffe.
+#ifdef GPU_ENABLED // Normal GPU + CPU Caffe.
 
 Caffe::Caffe()
     : cublas_handle_(NULL), curand_generator_(NULL), random_generator_(),
@@ -266,6 +223,51 @@ const char* curandGetErrorString(curandStatus_t error) {
   return "Unknown curand status";
 }
 
-#endif  // CPU_ONLY
+#elif defined FPGA_ENABLED
+//TODO:fill in common fpga code
+#else
+
+Caffe::Caffe()
+    : random_generator_(), mode_(Caffe::CPU) { }
+
+Caffe::~Caffe() { }
+
+void Caffe::set_random_seed(const unsigned int seed) {
+  // RNG seed
+  Get().random_generator_.reset(new RNG(seed));
+}
+
+void Caffe::SetDevice(const int device_id) {
+  NO_GPU;
+}
+
+void Caffe::DeviceQuery() {
+  NO_GPU;
+}
+
+
+class Caffe::RNG::Generator {
+ public:
+  Generator() : rng_(new caffe::rng_t(cluster_seedgen())) {}
+  explicit Generator(unsigned int seed) : rng_(new caffe::rng_t(seed)) {}
+  caffe::rng_t* rng() { return rng_.get(); }
+ private:
+  shared_ptr<caffe::rng_t> rng_;
+};
+
+Caffe::RNG::RNG() : generator_(new Generator()) { }
+
+Caffe::RNG::RNG(unsigned int seed) : generator_(new Generator(seed)) { }
+
+Caffe::RNG& Caffe::RNG::operator=(const RNG& other) {
+  generator_ = other.generator_;
+  return *this;
+}
+
+void* Caffe::RNG::generator() {
+  return static_cast<void*>(generator_->rng());
+}
+
+#endif  // CPU ONLY
 
 }  // namespace caffe

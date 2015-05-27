@@ -131,8 +131,11 @@ void PReLULayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
 }
 
 
-#ifdef CPU_ONLY
+#ifndef GPU_ENABLED
 STUB_GPU(PReLULayer);
+#endif 
+ #ifndef FPGA_ENABLED
+STUB_FPGA(PReLULayer);
 #endif
 
 INSTANTIATE_CLASS(PReLULayer);

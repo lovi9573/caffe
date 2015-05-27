@@ -50,11 +50,8 @@ struct DoubleCPU {
   static const Caffe::Brew device = Caffe::CPU;
 };
 
-#ifdef CPU_ONLY
 
-typedef ::testing::Types<FloatCPU, DoubleCPU> TestDtypesAndDevices;
-
-#else
+#ifdef GPU_ENABLED
 
 struct FloatGPU {
   typedef float Dtype;
@@ -68,6 +65,12 @@ struct DoubleGPU {
 
 typedef ::testing::Types<FloatCPU, DoubleCPU, FloatGPU, DoubleGPU>
     TestDtypesAndDevices;
+
+#elif FPGA_ENABLED
+//TODO: fill in fpga
+#else  //CPU FALLBACK
+
+typedef ::testing::Types<FloatCPU, DoubleCPU> TestDtypesAndDevices;
 
 #endif
 

@@ -120,8 +120,11 @@ void SoftmaxWithLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   }
 }
 
-#ifdef CPU_ONLY
+#ifndef GPU_ENABLED
 STUB_GPU(SoftmaxWithLossLayer);
+#endif 
+ #ifndef FPGA_ENABLED
+STUB_FPGA(SoftmaxWithLossLayer);
 #endif
 
 INSTANTIATE_CLASS(SoftmaxWithLossLayer);

@@ -1,35 +1,7 @@
 #ifndef CAFFE_UTIL_DEVICE_ALTERNATE_H_
 #define CAFFE_UTIL_DEVICE_ALTERNATE_H_
 
-#ifdef CPU_ONLY  // CPU-only Caffe.
-
-#include <vector>
-
-// Stub out GPU calls as unavailable.
-
-#define NO_GPU LOG(FATAL) << "Cannot use GPU in CPU-only Caffe: check mode."
-
-#define STUB_GPU(classname) \
-template <typename Dtype> \
-void classname<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom, \
-    const vector<Blob<Dtype>*>& top) { NO_GPU; } \
-template <typename Dtype> \
-void classname<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top, \
-    const vector<bool>& propagate_down, \
-    const vector<Blob<Dtype>*>& bottom) { NO_GPU; } \
-
-#define STUB_GPU_FORWARD(classname, funcname) \
-template <typename Dtype> \
-void classname<Dtype>::funcname##_##gpu(const vector<Blob<Dtype>*>& bottom, \
-    const vector<Blob<Dtype>*>& top) { NO_GPU; } \
-
-#define STUB_GPU_BACKWARD(classname, funcname) \
-template <typename Dtype> \
-void classname<Dtype>::funcname##_##gpu(const vector<Blob<Dtype>*>& top, \
-    const vector<bool>& propagate_down, \
-    const vector<Blob<Dtype>*>& bottom) { NO_GPU; } \
-
-#else  // Normal GPU + CPU Caffe.
+#ifdef GPU_ENABLED  // Normal GPU + CPU Caffe.
 
 #include <cublas_v2.h>
 #include <cuda.h>
@@ -97,6 +69,68 @@ inline int CAFFE_GET_BLOCKS(const int N) {
 
 }  // namespace caffe
 
-#endif  // CPU_ONLY
+#elif defined FPGA_ENABLED
+
+	//Todo: fill in fpga code
+
+#else
+	#define NO_DEVICE LOG(FATAL) << "No accelerator device support. Check mode or recompile with support."
+#endif // Device specific code inclusion
+
+#ifndef GPU_ENABLED
+
+#include <vector>
+
+// Stub out GPU calls as unavailable.
+
+#define NO_GPU LOG(FATAL) << "Cannot use GPU in CPU-only Caffe: check mode."
+
+#define STUB_GPU(classname) \
+template <typename Dtype> \
+void classname<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom, \
+    const vector<Blob<Dtype>*>& top) { NO_GPU; } \
+template <typename Dtype> \
+void classname<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top, \
+    const vector<bool>& propagate_down, \
+    const vector<Blob<Dtype>*>& bottom) { NO_GPU; } \
+
+#define STUB_GPU_FORWARD(classname, funcname) \
+template <typename Dtype> \
+void classname<Dtype>::funcname##_##gpu(const vector<Blob<Dtype>*>& bottom, \
+    const vector<Blob<Dtype>*>& top) { NO_GPU; } \
+
+#define STUB_GPU_BACKWARD(classname, funcname) \
+template <typename Dtype> \
+void classname<Dtype>::funcname##_##gpu(const vector<Blob<Dtype>*>& top, \
+    const vector<bool>& propagate_down, \
+    const vector<Blob<Dtype>*>& bottom) { NO_GPU; } \
+
+#endif //NO GPU
+
+#ifndef FPGA_ENABLED
+
+#define NO_FPGA LOG(FATAL) << "Cannot use FPGA. Check mode, or recompile with fpga support."
+
+#define STUB_FPGA(classname) \
+template <typename Dtype> \
+void classname<Dtype>::Forward_fpga(const vector<Blob<Dtype>*>& bottom, \
+    const vector<Blob<Dtype>*>& top) { NO_FPGA; } \
+template <typename Dtype> \
+void classname<Dtype>::Backward_fpga(const vector<Blob<Dtype>*>& top, \
+    const vector<bool>& propagate_down, \
+    const vector<Blob<Dtype>*>& bottom) { NO_FPGA; } \
+
+#define STUB_FPGA_FORWARD(classname, funcname) \
+template <typename Dtype> \
+void classname<Dtype>::funcname##_##fpga(const vector<Blob<Dtype>*>& bottom, \
+    const vector<Blob<Dtype>*>& top) { NO_FPGA; } \
+
+#define STUB_FPGA_BACKWARD(classname, funcname) \
+template <typename Dtype> \
+void classname<Dtype>::funcname##_##fpga(const vector<Blob<Dtype>*>& top, \
+    const vector<bool>& propagate_down, \
+    const vector<Blob<Dtype>*>& bottom) { NO_FPGA; } \
+
+#endif  //NO FPGA
 
 #endif  // CAFFE_UTIL_DEVICE_ALTERNATE_H_

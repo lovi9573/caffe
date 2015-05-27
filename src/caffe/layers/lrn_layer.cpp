@@ -247,10 +247,15 @@ void LRNLayer<Dtype>::WithinChannelBackward(
   }
 }
 
-#ifdef CPU_ONLY
+#ifndef GPU_ENABLED
 STUB_GPU(LRNLayer);
 STUB_GPU_FORWARD(LRNLayer, CrossChannelForward);
 STUB_GPU_BACKWARD(LRNLayer, CrossChannelBackward);
+#endif
+#ifndef FPGA_ENABLED
+STUB_FPGA(LRNLayer);
+STUB_FPGA_FORWARD(LRNLayer, CrossChannelForward);
+STUB_FPGA_BACKWARD(LRNLayer, CrossChannelBackward);
 #endif
 
 INSTANTIATE_CLASS(LRNLayer);

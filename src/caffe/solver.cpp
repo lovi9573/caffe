@@ -507,7 +507,6 @@ void SGDSolver<Dtype>::ComputeUpdateValue() {
     }
     break;
   case Caffe::GPU:
-#ifndef CPU_ONLY
 #ifdef GPU_ENABLED
     for (int param_id = 0; param_id < net_params.size(); ++param_id) {
       // Compute the value to history, and then copy them to the blob's diff.
@@ -544,14 +543,13 @@ void SGDSolver<Dtype>::ComputeUpdateValue() {
     }
 #else
     NO_GPU;
-#endif
-#endif
+#endif //End gpu
   case Caffe::FPGA:
-#ifndef CPU_ONY
 #ifdef FPGA_ENABLE
   //TODO: SGD UPDATE
+#else
+	  NO_FPGA;
 #endif  //FPGA_ENABLED
-#endif //!CPU_ONLY
     break;
   default:
     LOG(FATAL) << "Unknown caffe mode: " << Caffe::mode();
@@ -641,7 +639,6 @@ void NesterovSolver<Dtype>::ComputeUpdateValue() {
     }
     break;
   case Caffe::GPU:
-#ifndef CPU_ONLY
 #ifdef GPU_ENABLED
     for (int param_id = 0; param_id < net_params.size(); ++param_id) {
       // save history momentum for stepping back
@@ -689,14 +686,13 @@ void NesterovSolver<Dtype>::ComputeUpdateValue() {
     }
 #else
     NO_GPU;
-#endif
-#endif
+#endif //GPU
   case Caffe::FPGA:
-#ifndef CPU_ONLY
 #ifdef FPGA_ENABLE
   //TODO: NESTEROVSOLVER?
-#endif  //FPGA_ENABLED
-#endif //!CPU_ONLY
+#else
+	  NO_FPGA;
+#endif //FPGA
     break;
   default:
     LOG(FATAL) << "Unknown caffe mode: " << Caffe::mode();
@@ -775,7 +771,6 @@ void AdaGradSolver<Dtype>::ComputeUpdateValue() {
     }
     break;
   case Caffe::GPU:
-#ifndef CPU_ONLY
 #ifdef GPU_ENABLED
     for (int param_id = 0; param_id < net_params.size(); ++param_id) {
       Dtype local_rate = rate * net_params_lr[param_id];
@@ -833,13 +828,13 @@ void AdaGradSolver<Dtype>::ComputeUpdateValue() {
 #else
     NO_GPU;
 #endif
-#endif
   case Caffe::FPGA:
-#ifndef CPU_ONLY
 #ifdef FPGA_ENABLE
   //TODO: ADAGRAD SOLVER?
+#else
+	  NO_FPGA;
 #endif  //FPGA_ENABLED
-#endif //!CPU_ONLY
+
     break;
   default:
     LOG(FATAL) << "Unknown caffe mode: " << Caffe::mode();

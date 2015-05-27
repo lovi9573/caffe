@@ -46,14 +46,14 @@ list(APPEND Caffe_LINKER_LIBS ${Snappy_LIBRARIES})
 # ---[ CUDA
 include(cmake/Cuda.cmake)
 if(NOT HAVE_CUDA)
-  if(CPU_ONLY)
+  if(NOT GPU_ENABLED)
     message("-- CUDA is disabled. Building without it...")
   else()
     message("-- CUDA is not detected by cmake. Building without it...")
   endif()
 
   # TODO: remove this not cross platform define in future. Use caffe_config.h instead.
-  add_definitions(-DCPU_ONLY)
+  # add_definitions(-DCPU_ONLY)
 endif()
 
 # ---[ OpenCV

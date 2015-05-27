@@ -12,7 +12,13 @@
 #cmakedefine USE_CUDNN
 
 /* NVIDA cuDNN */
-#cmakedefine CPU_ONLY
+/*#cmakedefine CPU-ONLY */
+
+/* Use NVIDIA CUDA */
+#cmakedefine GPU_ENABLED
+
+/* Use FPGA */
+#cmakedefine FPGA_ENABLED
 
 /* Test device */
 #define CUDA_TEST_DEVICE ${CUDA_TEST_DEVICE}

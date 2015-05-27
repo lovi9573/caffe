@@ -11,16 +11,15 @@ SyncedMemory::~SyncedMemory() {
     CaffeFreeHost(cpu_ptr_);
   }
 
-#ifndef CPU_ONLY
+
 #ifdef GPU_ENABLED
   if (gpu_ptr_) {
     CUDA_CHECK(cudaFree(gpu_ptr_));
   }
-#endif //GPU_ENABLED
-#ifdef FPGA_ENABLE
+#elif defined FPGA_ENABLE
   //TODO: FREE FPGA MEM
 #endif  //FPGA_ENABLED
-#endif //!CPU_ONLY
+
 }
 
 inline void SyncedMemory::to_cpu() {
@@ -32,7 +31,7 @@ inline void SyncedMemory::to_cpu() {
     own_cpu_data_ = true;
     break;
   case HEAD_AT_DEVICE:
-#ifndef CPU_ONLY
+
 #ifdef GPU_ENABLED
     if (cpu_ptr_ == NULL) {
       CaffeMallocHost(&cpu_ptr_, size_);
@@ -40,13 +39,12 @@ inline void SyncedMemory::to_cpu() {
     }
     caffe_gpu_memcpy(size_, gpu_ptr_, cpu_ptr_);
     head_ = SYNCED;
+#elif defined FPGA_ENABLED
+  //TODO: copy mem down do cpu
 #else
     NO_GPU;
 #endif
-#ifdef FPGA_ENABLE
-  //TODO: copy mem down do cpu
-#endif  //FPGA_ENABLED
-#endif //!CPU_ONLY
+
     break;
   case HEAD_AT_CPU:
   case SYNCED:
@@ -55,7 +53,7 @@ inline void SyncedMemory::to_cpu() {
 }
 
 inline void SyncedMemory::to_device() {
-#ifndef CPU_ONLY
+
 #ifdef GPU_ENABLED
   switch (head_) {
   case UNINITIALIZED:
@@ -74,13 +72,11 @@ inline void SyncedMemory::to_device() {
   case SYNCED:
     break;
   }
-#else
-  NO_GPU;
-#endif //GPU_ENABLED
-#ifdef FPGA_ENABLE
+#elif defined  FPGA_ENABLE
   //TODO: copy data to fpga
-#endif  //FPGA_ENABLED
-#endif //!CPU_ONLY
+ #else
+  NO_GPU;
+#endif
 }
 
 const void* SyncedMemory::cpu_data() {
@@ -99,17 +95,15 @@ void SyncedMemory::set_cpu_data(void* data) {
 }
 
 const void* SyncedMemory::device_data() {
-#ifndef CPU_ONLY
+
 #ifdef GPU_ENABLED
   to_device();
   return (const void*)gpu_ptr_;
+#elif defined FPGA_ENABLE
+  //TODO: sync and retreive fpga data
 #else
   NO_GPU;
-#endif //GPU_ENABLED
-#ifdef FPGA_ENABLE
-  //TODO: sync and retreive fpga data
-#endif  //FPGA_ENABLED
-#endif //!CPU_ONLY
+#endif
 }
 
 void* SyncedMemory::mutable_cpu_data() {
@@ -119,18 +113,16 @@ void* SyncedMemory::mutable_cpu_data() {
 }
 
 void* SyncedMemory::mutable_gpu_data() {
-#ifndef CPU_ONLY
+
 #ifdef GPU_ENABLED
   to_device();
   head_ = HEAD_AT_DEVICE;
   return gpu_ptr_;
+#elif defined FPGA_ENABLE
+  //TODO: SYNC AND RETREIEVE FPGA MUTABLE DATA
 #else
   NO_GPU;
-#endif //GPU_ENABLED
-#ifdef FPGA_ENABLE
-  //TODO: SYNC AND RETREIEVE FPGA MUTABLE DATA
-#endif  //FPGA_ENABLED
-#endif //!CPU_ONLY
+#endif
 }
 
 

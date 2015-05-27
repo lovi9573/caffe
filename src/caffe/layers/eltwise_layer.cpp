@@ -151,8 +151,11 @@ void EltwiseLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   }
 }
 
-#ifdef CPU_ONLY
+#ifndef GPU_ENABLED
 STUB_GPU(EltwiseLayer);
+#endif 
+ #ifndef FPGA_ENABLED
+STUB_FPGA(EltwiseLayer);
 #endif
 
 INSTANTIATE_CLASS(EltwiseLayer);

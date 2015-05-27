@@ -17,8 +17,11 @@ void SilenceLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   }
 }
 
-#ifdef CPU_ONLY
+#ifndef GPU_ENABLED
 STUB_GPU(SilenceLayer);
+#endif 
+ #ifndef FPGA_ENABLED
+STUB_FPGA(SilenceLayer);
 #endif
 
 INSTANTIATE_CLASS(SilenceLayer);

@@ -24,8 +24,11 @@ void ThresholdLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   }
 }
 
-#ifdef CPU_ONLY
+#ifndef GPU_ENABLED
 STUB_GPU_FORWARD(ThresholdLayer, Forward);
+#endif
+#ifndef FPGA_ENABLED
+STUB_FPGA_FORWARD(ThresholdLayer, Forward);
 #endif
 
 INSTANTIATE_CLASS(ThresholdLayer);

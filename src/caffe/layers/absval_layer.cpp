@@ -35,8 +35,11 @@ void AbsValLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   }
 }
 
-#ifdef CPU_ONLY
+#ifndef GPU_ENABLED
 STUB_GPU(AbsValLayer);
+#endif 
+ #ifndef FPGA_ENABLED
+STUB_FPGA(AbsValLayer);
 #endif
 
 INSTANTIATE_CLASS(AbsValLayer);

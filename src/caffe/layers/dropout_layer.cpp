@@ -68,8 +68,11 @@ void DropoutLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
 }
 
 
-#ifdef CPU_ONLY
+#ifndef GPU_ENABLED
 STUB_GPU(DropoutLayer);
+#endif 
+ #ifndef FPGA_ENABLED
+STUB_FPGA(DropoutLayer);
 #endif
 
 INSTANTIATE_CLASS(DropoutLayer);

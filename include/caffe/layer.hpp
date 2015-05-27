@@ -312,6 +312,15 @@ class Layer {
     // LOG(WARNING) << "Using CPU code as backup.";
     return Forward_cpu(bottom, top);
   }
+  /**
+   * @brief Using the FPGA device, compute the layer output.
+   *        Fall back to Forward_cpu() if unavailable.
+   */
+  virtual void Forward_fpga(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top) {
+    // LOG(WARNING) << "Using CPU code as backup.";
+    return Forward_cpu(bottom, top);
+  }
 
   /**
    * @brief Using the CPU device, compute the gradients for any parameters and
@@ -326,6 +335,17 @@ class Layer {
    *        Fall back to Backward_cpu() if unavailable.
    */
   virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>& propagate_down,
+      const vector<Blob<Dtype>*>& bottom) {
+    // LOG(WARNING) << "Using CPU code as backup.";
+    Backward_cpu(top, propagate_down, bottom);
+  }
+  /**
+   * @brief Using the FPGA device, compute the gradients for any parameters and
+   *        for the bottom blobs if propagate_down is true.
+   *        Fall back to Backward_cpu() if unavailable.
+   */
+  virtual void Backward_fpga(const vector<Blob<Dtype>*>& top,
       const vector<bool>& propagate_down,
       const vector<Blob<Dtype>*>& bottom) {
     // LOG(WARNING) << "Using CPU code as backup.";
@@ -420,7 +440,7 @@ inline Dtype Layer<Dtype>::Forward(const vector<Blob<Dtype>*>& bottom,
     break;
   case Caffe::GPU:
     Forward_gpu(bottom, top);
-#ifndef CPU_ONLY
+
 #ifdef GPU_ENABLED
     for (int top_id = 0; top_id < top.size(); ++top_id) {
       if (!this->loss(top_id)) { continue; }
@@ -432,14 +452,13 @@ inline Dtype Layer<Dtype>::Forward(const vector<Blob<Dtype>*>& bottom,
       loss += blob_loss;
     }
 #endif //GPU_ENABLED
-#endif //!CPU_ONLY
   case Caffe::FPGA:
 	  Forward_fpga(bottom, top);
-#ifndef CPU_ONLY
+
 #ifdef FPGA_ENABLE
   //TODO: Fill in FPGA forward code
 #endif  //FPGA_ENABLED
-#endif //!CPU_ONLY
+
     break;
   default:
     LOG(FATAL) << "Unknown caffe mode.";

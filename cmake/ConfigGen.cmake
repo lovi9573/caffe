@@ -42,7 +42,8 @@ function(caffe_generate_export_configs)
   set(Caffe_DEFINITIONS "")
   if(NOT HAVE_CUDA)
     set(HAVE_CUDA FALSE)
-    list(APPEND Caffe_DEFINITIONS -DCPU_ONLY)
+    #TODO: evaluate what should go here.
+    #list(APPEND Caffe_DEFINITIONS -DCPU_ONLY)
   endif()
 
   if(NOT HAVE_CUDNN)

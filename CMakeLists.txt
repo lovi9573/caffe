@@ -13,8 +13,9 @@ include(cmake/Summary.cmake)
 include(cmake/ConfigGen.cmake)
 
 # ---[ Options
-caffe_option(CPU_ONLY  "Build Caffe wihtout CUDA support" OFF) # TODO: rename to USE_CUDA
-caffe_option(USE_CUDNN "Build Caffe with cuDNN libary support" ON IF NOT CPU_ONLY)
+caffe_option(GPU_ENABLED  "Build Caffe with CUDA support" OFF) # TODO: rename to USE_CUDA
+caffe_option(FPGA_ENABLED  "Build Caffe with FPGA support" OFF) # TODO: rename to USE_FPGA
+caffe_option(USE_CUDNN "Build Caffe with cuDNN libary support" ON IF GPU_ENABLED)
 caffe_option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 caffe_option(BUILD_python "Build Python wrapper" ON)
 set(python_version "2" CACHE STRING "Specify which python version to use")

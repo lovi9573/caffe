@@ -67,8 +67,11 @@ void HDF5OutputLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   return;
 }
 
-#ifdef CPU_ONLY
+#ifndef GPU_ENABLED
 STUB_GPU(HDF5OutputLayer);
+#endif 
+ #ifndef FPGA_ENABLED
+STUB_FPGA(HDF5OutputLayer);
 #endif
 
 INSTANTIATE_CLASS(HDF5OutputLayer);

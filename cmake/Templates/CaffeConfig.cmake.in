@@ -53,6 +53,8 @@ set(Caffe_LIBRARIES caffe)
 set(Caffe_DEFINITIONS "@Caffe_DEFINITIONS@")
 
 # Cuda support variables
-set(Caffe_CPU_ONLY @CPU_ONLY@)
+#set(Caffe_CPU_ONLY @CPU_ONLY@)
+set(Caffe_FPGA_ENABLED @FPGA_ENABLED@)
+set(Caffe_GPU_ENABLED @GPU_ENABLED@)
 set(Caffe_HAVE_CUDA @HAVE_CUDA@)
 set(Caffe_HAVE_CUDNN @HAVE_CUDNN@)

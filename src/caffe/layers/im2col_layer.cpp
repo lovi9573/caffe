@@ -85,8 +85,11 @@ void Im2colLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   }
 }
 
-#ifdef CPU_ONLY
+#ifndef GPU_ENABLED
 STUB_GPU(Im2colLayer);
+#endif 
+ #ifndef FPGA_ENABLED
+STUB_FPGA(Im2colLayer);
 #endif
 
 INSTANTIATE_CLASS(Im2colLayer);

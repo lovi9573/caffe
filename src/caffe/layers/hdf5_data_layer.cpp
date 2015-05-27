@@ -157,8 +157,11 @@ void HDF5DataLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   }
 }
 
-#ifdef CPU_ONLY
+#ifndef GPU_ENABLED
 STUB_GPU_FORWARD(HDF5DataLayer, Forward);
+#endif
+#ifndef FPGA_ENABLED
+STUB_FPGA_FORWARD(HDF5DataLayer, Forward);
 #endif
 
 INSTANTIATE_CLASS(HDF5DataLayer);

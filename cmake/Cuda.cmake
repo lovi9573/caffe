@@ -1,4 +1,4 @@
-if(CPU_ONLY)
+if(NOT GPU_ENABLED)
   return()
 endif()
 

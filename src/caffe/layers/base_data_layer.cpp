@@ -77,8 +77,11 @@ void BasePrefetchingDataLayer<Dtype>::Forward_cpu(
   CreatePrefetchThread();
 }
 
-#ifdef CPU_ONLY
+#ifndef GPU_ENABLED
 STUB_GPU_FORWARD(BasePrefetchingDataLayer, Forward);
+#endif
+#ifndef FPGA_ENABLED
+STUB_FPGA_FORWARD(BasePrefetchingDataLayer, Forward);
 #endif
 
 INSTANTIATE_CLASS(BaseDataLayer);

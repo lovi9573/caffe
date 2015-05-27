@@ -127,17 +127,16 @@ class Caffe {
     }
     return *(Get().random_generator_);
   }
-#ifndef CPU_ONLY
+
 #ifdef GPU_ENABLED
   inline static cublasHandle_t cublas_handle() { return Get().cublas_handle_; }
   inline static curandGenerator_t curand_generator() {
     return Get().curand_generator_;
   }
-#endif //GPU_ENABLED
-#ifdef FPGA_ENABLE
+#elif defined FPGA_ENABLE
   //TODO: Fill in FPGA blas implementation
 #endif  //FPGA_ENABLED
-#endif //!CPU_ONLY
+
 
   // Returns the mode: running on CPU or GPU.
   inline static Brew mode() { return Get().mode_; }
@@ -156,15 +155,14 @@ class Caffe {
   static void DeviceQuery();
 
  protected:
-#ifndef CPU_ONLY
+
 #ifdef GPU_ENABLED
   cublasHandle_t cublas_handle_;
   curandGenerator_t curand_generator_;
-#endif //GPU_ENABLED
-#ifdef FPGA_ENABLE
+#elif defined FPGA_ENABLE
   //TODO: FPGA BLAS data members
 #endif  //FPGA_ENABLED
-#endif //!CPU_ONLY
+
   shared_ptr<RNG> random_generator_;
 
   Brew mode_;

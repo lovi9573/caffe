@@ -38,8 +38,11 @@ void BNLLLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   }
 }
 
-#ifdef CPU_ONLY
+#ifndef GPU_ENABLED
 STUB_GPU(BNLLLayer);
+#endif 
+ #ifndef FPGA_ENABLED
+STUB_FPGA(BNLLLayer);
 #endif
 
 INSTANTIATE_CLASS(BNLLLayer);
